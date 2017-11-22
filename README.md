@@ -3,7 +3,7 @@
 Completely opensource Arduino-based access control system for FabLabs/Hackerspaces/any public space wants
 cheap access control
 Support Wiegand readers with keypad too (like Smartec ST-PR160EK)
-Based on software Ardiuno interrupts and timers. 
+Based on software Ardiuno interrupts and timers.
 Easy control it via web browser or Telegram bot
 Backend is based on Perl.
 
@@ -12,7 +12,7 @@ Backend is based on Perl.
 * Two Wiegand readers: one with keypad for entrance and one without keypad for exit
 * One door relay
 * Multiple pins for alarms
-* Support of 7 and 8 bit 
+* Support of 7 and 8 bit
 * keypad code both (universal way of detecting end of transmission)
 * Email or(and) Telegram notifications and alarms
 * Universal (tested at Arduino Duemilanove + OrangePi but can work with any Arduino and single board linux computer)
