@@ -23,17 +23,19 @@ sub create_tables {
 	# reader_port - port of hardware Wiegand reader attached to particular door
 	# users_restricted - door can be opened only by particular users (see permissions table)
 
+	# Priority: opening_script, gpio_pin, mac_addr
+
 	my $sql = <<'END_SQL';
 CREATE TABLE doors (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	created DEFAULT CURRENT_TIMESTAMP,
-		door_id INTEGER,
 		name VARCHAR(160),
 		gpio_pin INTEGER(2),
 		mac_addr VARCHAR(12),
 		opening_script VARCHAR(255),
 		reader_port VARCHAR(255),
-		users_restricted VARCHAR(1)
+		users_restricted VARCHAR(1),
+		state_pin INTEGER(2)
 		)
 END_SQL
 	$dbh->do($sql);
