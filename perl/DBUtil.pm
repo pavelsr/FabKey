@@ -54,6 +54,34 @@ sub search_user_in_db {
 
 
 
+=head1 door_permissions_all
+
+Return all door permissions
+
+=cut
+
+
+sub door_permissions_all {
+	my ($self, $door_id) = @_;  # $kv - key & value
+  $self->{dbh}->selectall_hashref('SELECT * FROM permissions WHERE door_id ='.$door_id, 'id');
+}
+
+
+=head1 is_user_allowed_door
+
+Check is user allowed to use particular door
+
+=cut
+
+
+
+sub is_user_allowed_door {
+	my ($self, %params) = @_;  # $kv - key & value
+  my $res = $self->{dbh}->selectrow_hashref('SELECT * FROM permissions WHERE door_id='.$params{door_id}.' AND user_id='.$params{user_id});
+  if (%$res) { return 1 } else { return 0 };
+}
+
+
 ### OLD CODE
 
 

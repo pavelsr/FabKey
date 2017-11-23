@@ -6,12 +6,13 @@ use Data::Dumper;
 my $dbh = DBI->connect('dbi:SQLite:dbname=skud.db',"","");
 
 my %user = (
-       card_id=>'7357893', 
-       pin=>'1234', 
-       name=>'DemoName', 
-       surname=>'DemoSurname', 
-       email=>'pavel@fablab61.ru', 
-       phone=>'+79885851900'
+       card_id=>'7357893',
+       pin=>'1234',
+       name=>'DemoName',
+       surname=>'DemoSurname',
+       telegram_username => 'serikoff',
+       email=>'pavelsr@cpan.org',
+       phone=>'+78633090549'
     );
 
 add_to_db( \%user ,'users');

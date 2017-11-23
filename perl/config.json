@@ -1,0 +1,7 @@
+{
+ "FABKEY_BOT_TOKEN": "",
+ "DBI": "dbi:SQLite:dbname=skud.db",
+ "GPIO_MODE": "bcm",
+ "DEFAULT_TIMEOUT_SEC": 3,
+ "PERMSISSIONS_MODE": "allow"
+}

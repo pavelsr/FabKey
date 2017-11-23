@@ -88,7 +88,7 @@ CREATE TABLE users (
     card_id INTEGER,
 		telegram_id INTEGER,
 		telegram_username VARCHAR(160),
-    pin INTEGER,
+    pin INTEGER(4),
     name VARCHAR(160),
     surname VARCHAR(160),
 		phone VARCHAR(12),
