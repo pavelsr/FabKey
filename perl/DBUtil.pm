@@ -17,6 +17,8 @@ use DBD::SQLite;
 sub new {
     my ($class, %args) = @_;
     $args{'dbh'} = DBI->connect($args{'dbi'},"","");
+    $args{'gpio_script'} = './open_gpio.sh';
+    $args{'wireless_script'} = './open_wireless.sh';
     return bless \%args, $class;
 }
 
@@ -80,6 +82,47 @@ sub is_user_allowed_door {
   my $res = $self->{dbh}->selectrow_hashref('SELECT * FROM permissions WHERE door_id='.$params{door_id}.' AND user_id='.$params{user_id});
   if (%$res) { return 1 } else { return 0 };
 }
+
+
+=head1 is_user_allowed_door
+
+Check is user allowed to use particular door
+
+=cut
+
+
+sub open_door {
+	my ($self, $door_id) = @_;  # $kv - key & value
+  my $res = $self->{dbh}->selectrow_hashref('SELECT * FROM doors WHERE id='.$door_id);
+  if (defined $res) {
+    if ($res->{opening_script}) {
+      return `$res->{opening_script}`;
+    } elsif ($res->{gpio_pin}){
+      return `$self->{gpio_script} $res->{gpio_pin}`;  # use default script for gpio
+    } elsif ($res->{mac_addr}) {
+      return `$self->{wireless_script} $res->{mac_addr}`;
+    } else {
+      return "No door opening definition";
+    }
+  } else { return "Door is undefined"; }
+}
+
+
+=head1 is_door_restricted
+
+Return all door permissions
+
+=cut
+
+
+sub is_door_restricted {
+	my ($self, $door_id) = @_;  # $kv - key & value
+  my $res = $self->{dbh}->selectrow_hashref('SELECT is_users_restricted FROM door WHERE id ='.$door_id);
+  if ($res->{is_users_restricted }) { return 1; } else { return 0; }
+}
+
+
+
 
 
 ### OLD CODE

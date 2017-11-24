@@ -34,7 +34,7 @@ CREATE TABLE doors (
 		mac_addr VARCHAR(12),
 		opening_script VARCHAR(255),
 		reader_port VARCHAR(255),
-		users_restricted VARCHAR(1),
+		is_users_restricted VARCHAR(1),
 		state_pin INTEGER(2)
 		)
 END_SQL
@@ -93,7 +93,8 @@ CREATE TABLE users (
     surname VARCHAR(160),
 		phone VARCHAR(12),
     email VARCHAR(160),
-		is_blocked INTEGER
+		is_blocked INTEGER,
+		is_admin INTEGER
     )
 END_SQL
     $dbh->do($sql);
