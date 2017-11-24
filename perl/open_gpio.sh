@@ -9,4 +9,6 @@ PIN=$1
 # sleep 3
 # sudo gpio -g write $PIN 0
 
-echo "Door with gpio_pin=$PIN is opened!";
+# echo "Door with gpio_pin=$PIN is opened!";
+
+echo 1;

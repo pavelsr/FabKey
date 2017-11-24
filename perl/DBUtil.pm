@@ -122,7 +122,31 @@ sub is_door_restricted {
 }
 
 
+=head1 available_doors
 
+Return all available for this user doors
+
+=cut
+
+
+sub available_doors {
+	my ($self, $user_id) = @_;  # $user_id is optional
+  my $res = $self->{dbh}->selectall_hashref('SELECT * FROM doors', 'id');
+}
+
+
+
+
+sub get_door_id_by_name {
+  my ($self, $name_str) = @_;  # $user_id is optional
+  $self->{dbh}->selectrow_hashref('SELECT id FROM doors WHERE name = '.$name_str)->{id};
+}
+
+
+sub get_door_info_by_name {
+  my ($self, $name_str) = @_;  # $user_id is optional
+  $self->{dbh}->selectrow_hashref('SELECT * FROM doors WHERE name= \''.$name_str.'\'');
+}
 
 
 ### OLD CODE

@@ -1,7 +1,9 @@
 {
- "FABKEY_BOT_TOKEN": "",
+ "FABKEY_BOT_TOKEN": "441592632:AAEACcNg6CXM_As4-zg4m68WrChis547iuo",
  "DBI": "dbi:SQLite:dbname=skud.db",
  "GPIO_MODE": "bcm",
  "DEFAULT_TIMEOUT_SEC": 3,
- "PERMSISSIONS_MODE": "allow"
+ "PERMSISSIONS_MODE": "allow",
+ "TG_MESSAGE_ACTUALITY_SEC": 30,
+ "MAIN_SRV_URL" : "http://127.0.0.1:3028/open"
 }

@@ -26,6 +26,20 @@ Backend is based on Perl.
 
 For more information please check [wiki](https://github.com/FabLab61/FabKey/wiki)
 
+## config.json Example
+
+```
+{
+ "FABKEY_BOT_TOKEN": "441592632:AAEACcNg6CXM_As4-zg4m68WrChis547ixt",
+ "DBI": "dbi:SQLite:dbname=skud.db",
+ "GPIO_MODE": "bcm",
+ "DEFAULT_TIMEOUT_SEC": 3,
+ "PERMSISSIONS_MODE": "allow",
+ "TG_MESSAGE_ACTUALITY_SEC": 30,
+ "MAIN_SRV_URL" : "http://127.0.0.1:3010"
+}
+```
+
 
 
 ## Database structure
