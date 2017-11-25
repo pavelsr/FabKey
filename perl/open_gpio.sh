@@ -11,4 +11,4 @@ PIN=$1
 
 # echo "Door with gpio_pin=$PIN is opened!";
 
-echo 1;
+printf 1;

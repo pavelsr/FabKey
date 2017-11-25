@@ -11,6 +11,7 @@ use Telegram::BotKit::Sessions;
 use Telegram::BotKit::Keyboards qw(create_one_time_keyboard);
 use JSON::MaybeXS;
 use Mojolicious::Lite;
+use lib '.';
 use DBUtil;
 use Data::Dumper;
 
@@ -92,7 +93,7 @@ helper answer => sub {
     warn "Door info: ".Dumper $door_info;
     $api->sendMessage({
 				chat_id => $chat_id,
-				text => 'PLease input your password (4 digits)',
+				text => 'Please input your password (4 digits)',
 			});
     $sessions->update($chat_id, 2); # 1 - id of screen
   } elsif ($sessions->last($chat_id) eq 2) { # password handler
@@ -105,7 +106,9 @@ helper answer => sub {
 
     warn "Req prms: ".Dumper $rp;
 
-    my $res = $c->ua->get( $config->{"MAIN_SRV_URL"} => form => $rp )->res->json;
+    # my $res = $c->ua->get( $config->{"MAIN_SRV_URL"} => form => $rp )->res->json;
+
+    my $res = $db->authorize_user($rp);
 
     warn "Result of server API call: ".Dumper $res;
 

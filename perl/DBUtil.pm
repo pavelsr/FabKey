@@ -5,7 +5,7 @@ package DBUtil;
 use DBI;
 use strict;
 use DBD::SQLite;
-# use Data::Dumper;
+use Data::Dumper; # leave only for debug
 
 =head1 Usage
 
@@ -146,6 +146,51 @@ sub get_door_id_by_name {
 sub get_door_info_by_name {
   my ($self, $name_str) = @_;  # $user_id is optional
   $self->{dbh}->selectrow_hashref('SELECT * FROM doors WHERE name= \''.$name_str.'\'');
+}
+
+
+=head1 authorize_user
+
+Perhaps the main function of business logic
+
+=cut
+
+
+sub authorize_user {
+  my ($self, $params) = @_;   # $params - hash. Return string
+  if (!exists $params->{telegram_username} && !exists $params->{telegram_id} && !exists $params->{card_id}) {
+    return 'Not enough parameters provided: telegram_username or telegram_id or card_id';
+  }
+  my @a =  qw/door_id pin/; # essential parameters
+  my @absent_params;
+  for (@a) {
+    if (!$params->{$_}) {
+      push @absent_params, $_;
+    }
+  }
+  if (@absent_params) {
+    return 'Not enough parameters provided: '.join(', ',@absent_params);
+  }
+  my %filtered_params = map { $_ => $params->{$_} } grep { exists $params->{$_} } qw/telegram_id card_id telegram_username/;
+  my $user = $self->search_user_in_db(%filtered_params);
+  warn Dumper $user;
+  if (%$user)  {
+
+    if ($self->is_door_restricted($params->{door_id})) {  # not implemented yet
+      my $perm = $self->door_permissions_all($params->{door_id});
+      warn "All door permissions: ".Dumper $perm;
+      return "Door is restricted for particular users. But check code is not implemented yet :)"
+    } else { # door is common
+      if ($user->{pin} eq $params->{pin}) {
+        return $self->open_door($params->{door_id});
+      } else {
+        return 'Wrong password!';
+      }
+    }
+
+    } else {
+        return 'User is not found in database';
+    }
 }
 
 
