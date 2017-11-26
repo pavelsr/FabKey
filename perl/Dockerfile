@@ -30,7 +30,7 @@ COPY bot_embedded.pl /fabkey
 RUN apk update && \
     apk add perl perl-dev g++ make wget curl wiringpi && \
     curl -L https://cpanmin.us | perl - App::cpanminus && \
-    rm -rf /root/.cpanm/* /usr/local/share/man/* && \
+    rm -rf /root/.cpanm/* /usr/local/share/man/*
 
 RUN cpanm --verbose --installdeps . && rm cpanfile
 
