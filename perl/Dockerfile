@@ -32,7 +32,7 @@ RUN apk update && \
     curl -L https://cpanmin.us | perl - App::cpanminus && \
     rm -rf /root/.cpanm/* /usr/local/share/man/*
 
-RUN cpanm --verbose --installdeps . && rm cpanfile
+RUN cpanm --installdeps . && rm cpanfile
 
 CMD ["perl", "bot_embedded.pl", "daemon", "-l", "http://*:8080"]
 WORKDIR /fabkey
