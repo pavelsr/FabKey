@@ -117,7 +117,7 @@ Return all door permissions
 
 sub is_door_restricted {
 	my ($self, $door_id) = @_;  # $kv - key & value
-  my $res = $self->{dbh}->selectrow_hashref('SELECT is_users_restricted FROM door WHERE id ='.$door_id);
+  my $res = $self->{dbh}->selectrow_hashref('SELECT is_users_restricted FROM doors WHERE id ='.$door_id);
   if ($res->{is_users_restricted }) { return 1; } else { return 0; }
 }
 

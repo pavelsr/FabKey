@@ -20,8 +20,8 @@ my $config = plugin JSONConfig => {file => 'config.json'};
 my $telegram_token = $ENV{FABKEY_BOT_TOKEN} || $config->{FABKEY_BOT_TOKEN};
 my $bot_name = '';
 my $api;
-my $polling_timeout = 1; # default
-my $db = DBUtil->new(dbi => $config->{"DBI"});
+my $polling_timeout = 3; # default
+my $db = DBUtil->new(dbi => $config->{"DBI"} || $ENV{FABKEY_DBI});
 app->log->debug("Using database: ".$config->{"DBI"});
 my $sessions = Telegram::BotKit::Sessions->new();
 
@@ -90,7 +90,7 @@ helper answer => sub {
     # get door id by name
     # $door_id = $db->get_door_id_by_name($msg);
     $door_info = $db->get_door_info_by_name($msg);
-    warn "Door info: ".Dumper $door_info;
+    app->log->info("Door info: ".Dumper $door_info);
     $api->sendMessage({
 				chat_id => $chat_id,
 				text => 'Please input your password (4 digits)',
@@ -103,14 +103,13 @@ helper answer => sub {
       door_id => $door_info->{id},
       pin => $msg
     };
-
-    warn "Req prms: ".Dumper $rp;
+    app->log->info("Req prms: ".Dumper $rp);
 
     # my $res = $c->ua->get( $config->{"MAIN_SRV_URL"} => form => $rp )->res->json;
 
     my $res = $db->authorize_user($rp);
 
-    warn "Result of server API call: ".Dumper $res;
+    app->log->info("Result of server API call: ".Dumper $res);
 
     #if ($res eq 'Door with gpio_pin='.$door_info->{gpio_pin}.' is opened!') {  # msg from echo of open_gpio.sh
 
@@ -151,7 +150,15 @@ if ($telegram_token) { # maybe add
 		my @updates = @{$api->getUpdates->{result}};
 		if (@updates) {
 			for my $u (@updates) {
-        app->answer($u); # Mojolicious::Lite ->  Mojolicious::Controller -> Mojolicious::Helper
+        ## check that update is no older than 60 seconds
+        my $curr = time();
+        my $diff_sec = $curr - $u->{message}{date};
+        app->log->info("Message delay, sec: ".$diff_sec);
+        if ($diff_sec <= 60) {
+          app->answer($u);
+        } else {
+          app->log->info("Detected update that was ".$diff_sec." seconds ago so it will be ignored");
+        }
         $api->getUpdates({ offset => $u->{update_id} + 1.0 }); # clear buffer
 			}
 		}

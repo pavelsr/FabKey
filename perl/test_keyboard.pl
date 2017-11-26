@@ -5,6 +5,8 @@ use Telegram::BotKit::Keyboards qw(create_one_time_keyboard create_inline_keyboa
 use Telegram::BotKit::Polling qw(get_last_messages);
 use Data::Dumper; # for debug
 
+use Date::Format;
+use Telegram::Bot::Message;
 # test of https://core.telegram.org/bots/api#replykeyboardmarkup
 
 
@@ -28,6 +30,13 @@ Mojo::IOLoop->recurring(1 => sub {
 	my $hash = get_last_messages($api);
 	while ( my ($chat_id, $update) = each(%$hash) ) {   # Answer to all connected clients
   	app->log->info("Update object:".Dumper $update);
+
+    my $mo = Telegram::Bot::Message->create_from_hash($update->{message});
+    my $dth =  time2str("%R %a %o %b %Y", $mo->date);
+    warn "Update time: ".$mo->date.", human: ".$dth;
+    my $curr = time();
+    warn "Current time: ".$curr;
+    warn "Difference, sec: ".($curr-($mo->date));
 
     if ($update->{message}{text} eq '/kb') {
       $api->sendMessage({
