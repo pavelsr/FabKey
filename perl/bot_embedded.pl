@@ -15,8 +15,9 @@ use lib '.';
 use DBUtil;
 use Data::Dumper;
 
+my $config;
 if (-e 'config.json') {
-  my $config = plugin JSONConfig => {file => 'config.json'};
+  $config = plugin JSONConfig => {file => 'config.json'};
 }
 my $telegram_token = $ENV{FABKEY_BOT_TOKEN} || $config->{FABKEY_BOT_TOKEN};
 my $bot_name = '';
