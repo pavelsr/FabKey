@@ -58,6 +58,13 @@ sub search_user_in_db {
 }
 
 
+sub search_in_table {
+	my ($self, $table_name, %kv) = @_;  # $kv - key & value
+  $self->{dbh}->selectrow_hashref('SELECT * FROM '.$table_name.' WHERE '.$self->construct_or_statement(%kv));   # need to call from DBI::st instead of DBI::db
+}
+
+
+
 
 =head1 door_permissions_all
 
@@ -202,8 +209,10 @@ sub prepare_sql {
     my @fields;
     my @values;
     foreach my $key ( keys %$hash ) {
-        push @fields, $key;
-        push @values, "'".$hash->{$key}."'";
+        if ($hash->{$key}) {
+          push @fields, $key;
+          push @values, "'".$hash->{$key}."'";
+        }
     }
     my $new_hash;
     $new_hash->{'fields'} = join(", ", @fields);
@@ -220,8 +229,28 @@ sub add_to_db {
 }
 
 
+# return ordered arrayref
 
+sub column_names {
+  my ($self, $table_name) = @_;
+  return $self->{dbh}->prepare('SELECT * FROM '.$table_name)->{NAME};
+}
 
+sub ask_for_values {
+    my ($self, $fields_array) = @_;
+    my $result;
+    for (@$fields_array) {
+  		print $_.": ";
+  		$result->{$_}=<STDIN>;
+  		chomp($result->{$_});
+  	}
+    return $result;
+}
+
+sub is_command_standart {
+    my ($self, $commamnd) = @_;
+    if (grep { $commamnd eq $_ } qw/insert update delete/ ) { return 1; } else { return 0; }
+}
 
 ### OLD CODE
 

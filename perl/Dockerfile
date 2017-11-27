@@ -20,6 +20,10 @@
 # Inspect running container
 # docker exec -t -i fabkey /bin/sh
 
+# Stop & remove all continers
+# docker stop $(docker ps -a -q)
+# docker rm $(docker ps -a -q)
+
 # You can use following base images to build this bot
 # https://hub.docker.com/r/armhf/perl/
 # https://hub.docker.com/r/armhf/alpine/

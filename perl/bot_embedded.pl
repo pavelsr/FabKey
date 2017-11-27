@@ -13,7 +13,7 @@ use JSON::MaybeXS;
 use Mojolicious::Lite;
 use lib '.';
 use DBUtil;
-use DBD::SQLite::Constants qw/:file_open/;
+# use DBD::SQLite::Constants qw/:file_open/;
 use Data::Dumper;
 
 my $config;
@@ -27,7 +27,8 @@ my $telegram_token = $ENV{FABKEY_BOT_TOKEN} || $config->{FABKEY_BOT_TOKEN};
 my $bot_name = '';
 my $api;
 my $polling_timeout = 3; # default
-my $db = DBUtil->new(dbi => $config->{"DBI"}, flags => { sqlite_open_flags => SQLITE_OPEN_READONLY });
+my $db = DBUtil->new(dbi => $config->{"DBI"});
+# my $db = DBUtil->new(dbi => $config->{"DBI"}, flags => { sqlite_open_flags => SQLITE_OPEN_READONLY });
 app->log->debug("Using database: ".$config->{"DBI"}.", telegram_token");
 my $sessions = Telegram::BotKit::Sessions->new();
 
@@ -68,7 +69,7 @@ helper answer => sub {
   $sessions->start($chat_id) if (!defined $sessions->all($chat_id));
   #$sessions->update($chat_id, $msg);
 
-  my $fabkey_user = $db->search_user_in_db(telegram_id => $from_id);
+  my $fabkey_user = $db->search_user_in_db(telegram_id => $from_id, telegram_username => $update->{message}{from}{username});
 
   ## FSM
   # https://metacpan.org/pod/FSA::Rules
@@ -130,12 +131,31 @@ helper answer => sub {
   			});
     }
     # $sessions->del($chat_id);
+  } elsif ( ($msg eq "/addme") || ($msg eq '/addme@'.$bot_name ) ) {
+    app->log->info("Some user requested access: ".Dumper $update->{message}{from});
+    #my %filtered_params = map { $_ => $update->{message}{from}->{$_} } grep { exists $update->{message}{from}->{$_} } qw/id username last_name first_name/;
+    my %filtered_params = map { $_ => $update->{message}{from}->{$_} } grep { exists $update->{message}{from}->{$_} } @{$db->column_names('telegram_admission_requests')};
+    $db->add_to_db(\%filtered_params, 'telegram_admission_requests');
+
+    $api->sendMessage({
+          chat_id => $chat_id,
+          text => 'Request sent. For any case, your telegram id listed below'
+    });
+    $api->sendMessage({
+          chat_id => $chat_id,
+          text => $update->{message}{from}{id}
+    });
+
   } else {
     $api->sendMessage({
         chat_id => $chat_id,
         text => 'Command not recognized. Try to start a new session: /open',
       });
   }
+
+
+
+
   # $sessions->del($chat_id);
 };
 

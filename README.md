@@ -39,6 +39,28 @@ docker run -v ${PWD}:/fabkey/data db.pl -a demo_data -d data/skud.db
 docker run -d --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FABKEY_DBI=dbi:SQLite:dbname=data/skud.db" --privileged -v ${PWD}:/fabkey/data pavelsr/fabkey
 ```
 
+## Built-in database scripts
+
+Managing users:
+
+```
+docker exec -it db.pl -a manage [users|doors] [insert|update|delete]
+```
+
+Quick add/remove/update:
+
+```
+docker exec -it db.pl -a manage users delete telegram_username serikoff
+```
+
+
+### Console
+
+```
+docker exec -t -i fabkey db.pl -a manage add -t users
+```
+
+
 ## config.json Example
 
 ```
@@ -64,7 +86,7 @@ Since web ui is not ready yet, now you can use following options to manage datab
 
 ### [sqlite-web](https://github.com/coleifer/sqlite-web)
 
-For now the best option is sqlite-web (though it doesn't allow to edit users)
+For now the best option is sqlite-web (unfortunately it doesn't allow to edit rows)
 
 ```
 sudo apt-get install python-pip
@@ -72,7 +94,7 @@ sudo pip install sqlite-web
 sqlite_web skud.db -x -d -H 0.0.0.0
 ```
 
-For constant monitoring of your DB via web interface you can run docker container
+For constant monitoring of your DB via web interface you can run [docker container](https://hub.docker.com/r/pavelsr/sqlite_web/) (run command below from folder where your database is stored)
 
 ```
 sudo docker run -d -v ${PWD}:/root -p 80:8080 pavelsr/sqlite_web:armhf skud.db
@@ -98,7 +120,14 @@ sudo apt install nodejs
 
 ```
 
+### [App::DBBrowser](https://metacpan.org/pod/distribution/App-DBBrowser/bin/db-browser)
 
+Also just view database content
+
+```
+sudo cpanm App::DBBrowser
+
+```
 
 
 ## Installation
