@@ -19,7 +19,7 @@ my $config;
 if (-e 'config.json') {
   $config = plugin JSONConfig => {file => 'config.json'};
 } else {
-  app->log->info("config.json file not found, using ENV variables")
+  app->log->info("config.json file not found, using ENV variables");
   $config->{"DBI"} = $ENV{FABKEY_DBI};
 }
 my $telegram_token = $ENV{FABKEY_BOT_TOKEN} || $config->{FABKEY_BOT_TOKEN};
