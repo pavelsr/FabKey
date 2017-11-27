@@ -32,7 +32,7 @@ For more information please check [wiki](https://github.com/FabLab61/FabKey/wiki
 The simplest way is to run from dockerizing
 
 ```
-curl -sSL https://get.docker.com | sh # install docker if not installed
+curl -sSL https://get.docker.com | sh - # install docker if not installed
 cd data # go to dir where you want to place SQLite database
 docker run -v ${PWD}:/fabkey/data db.pl -a deploy_db -d data/skud.db
 docker run -v ${PWD}:/fabkey/data db.pl -a demo_data -d data/skud.db
@@ -56,8 +56,6 @@ docker run -d --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FA
 
 ## Managing database
 
-
-
 ### WebUI and API
 
 Feature is in development :)
@@ -66,8 +64,19 @@ Since web ui is not ready yet, now you can use following options to manage datab
 
 ### [sqlite-web](https://github.com/coleifer/sqlite-web)
 
-For now the best option
+For now the best option is sqlite-web (though it doesn't allow to edit users)
 
+```
+sudo apt-get install python-pip
+sudo pip install sqlite-web
+sqlite_web skud.db -x -d -H 0.0.0.0
+```
+
+For constant monitoring of your DB via web interface you can run docker container
+
+```
+sudo docker run -d -v ${PWD}:/root -p 80:8080 pavelsr/sqlite_web:armhf skud.db
+```
 
 ### [sqlcrush](https://github.com/coffeeandscripts/sqlcrush)
 

@@ -14,11 +14,11 @@
 
 # Deploy && run
 # docker run -v ${PWD}:/fabkey/data pavelsr/fabkey perl db.pl -a deploy_db -d data/skud.db
-# docker run -v ${PWD}:/fabkey/data pavelsr/fabkey perl db.pl -a demo_data -d data/skud.db
+# docker run -d --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FABKEY_DBI=dbi:SQLite:dbname=data/skud.db" --privileged -v ${PWD}:/fabkey/data pavelsr/fabkey
 # docker run -d --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FABKEY_DBI=dbi:SQLite:dbname=data/skud.db" --privileged -v ${PWD}:/fabkey/data pavelsr/fabkey
 
-# Run for inspection
-# docker run -t -i pavelsr/fabkey /bin/sh
+# Inspect running container
+# docker exec -t -i fabkey /bin/sh
 
 # You can use following base images to build this bot
 # https://hub.docker.com/r/armhf/perl/
