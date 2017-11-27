@@ -22,6 +22,8 @@ sub new {
     return bless \%args, $class;
 }
 
+sub dbh { shift->{dbh} }
+
 sub construct_or_statement {
   my ($self, %kv) = @_; # %kv - key-value hash
   my $str = '('.(keys %kv)[0].'=\''.(values %kv)[0].'\')';
@@ -192,6 +194,32 @@ sub authorize_user {
         return 'User is not found in database';
     }
 }
+
+
+sub prepare_sql {
+    my ($self, $hash) = @_;
+    my @fields;
+    my @values;
+    foreach my $key ( keys %$hash ) {
+        push @fields, $key;
+        push @values, "'".$hash->{$key}."'";
+    }
+    my $new_hash;
+    $new_hash->{'fields'} = join(", ", @fields);
+    $new_hash->{'values'} = join(", ", @values);
+    return $new_hash;
+}
+
+
+sub add_to_db {
+    my ($self, $hash, $table_name) = @_;
+    my $h = $self->prepare_sql($hash);
+    $self->{dbh}->do("INSERT INTO ".$table_name." (".$h->{'fields'}.") VALUES (".$h->{'values'}.")") or die $self->{dbh}->errstr;
+    return 0;
+}
+
+
+
 
 
 ### OLD CODE

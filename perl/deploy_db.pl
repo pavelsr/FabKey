@@ -10,7 +10,10 @@ use DBI;
 use feature 'say';
 use Data::Dumper;
 
-my $dbh = DBI->connect('dbi:SQLite:dbname=skud.db',"","");
+$database_file_rel_location = 'skud.db';
+$database_file_rel_location=$1 if $1; # location of database file relative to WORKDIR (/fabkey by default)
+my $dbh = DBI->connect('dbi:SQLite:dbname='.$database_file_rel_location,"","");
+say "Deploying db at ".$database_file_rel_location." ...";
 
 create_tables($dbh);
 

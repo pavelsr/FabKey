@@ -4,19 +4,23 @@
 # Build
 # docker build -t pavelsr/fabkey .
 
-# Add tags like
-# docker tag pavelsr/alpine-perl-libxml2:1.0 pavelsr/alpine-perl-libxml2:latest
-# docker tag 0e5574283393 pavelsr/alpine-perl-libxml2:latest
-# docker tag httpd fedora/httpd:version1.0
+# Add tags to image
+# docker tag pavelsr/fabkey:1.0 pavelsr/fabkey:latest
+# docker tag 0e5574283393 pavelsr/fabkey:latest
 
 # Publish
 # docker login
 # docker push pavelsr/fabkey
 
+# Deploy && run
+# docker run -v ${PWD}:/fabkey/data db.pl -a deploy_db -d data/skud.db
+# docker run -v ${PWD}:/fabkey/data db.pl -a demo_data -d data/skud.db
+# docker run -t --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FABKEY_DBI=dbi:SQLite:dbname=data/skud.db" --privileged -v ${PWD}:/fabkey/data pavelsr/fabkey
+
 # Run for inspection
-# docker run -t -i pavelsr/alpine-perl-libxml2 /bin/sh
+# docker run -t -i pavelsr/fabkey /bin/sh
 
-
+# You can use following base images to build this bot
 # https://hub.docker.com/r/armhf/perl/
 # https://hub.docker.com/r/armhf/alpine/
 
@@ -39,8 +43,11 @@ RUN cpanm WWW::Telegram::BotAPI
 RUN cpanm Telegram::Bot::Message
 RUN cpanm Telegram::BotKit::Sessions
 RUN cpanm Telegram::BotKit::Keyboards
+RUN cpanm Getopt::Long
 
-COPY . /fabkey/
+COPY bot_embedded.pl /fabkey/
+COPY DBUtil.pm /fabkey/
+COPY db.pl /fabkey/
 
 CMD ["perl", "bot_embedded.pl", "daemon", "-l", "http://*:8080"]
 WORKDIR /fabkey

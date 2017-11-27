@@ -27,7 +27,7 @@ my $bot_name = '';
 my $api;
 my $polling_timeout = 3; # default
 my $db = DBUtil->new(dbi => $config->{"DBI"});
-app->log->debug("Using database: ".$config->{"DBI"});
+app->log->debug("Using database: ".$config->{"DBI"}.", telegram_token");
 my $sessions = Telegram::BotKit::Sessions->new();
 
 helper check_for_updates => sub {
