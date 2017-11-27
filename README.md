@@ -34,7 +34,7 @@ The simplest way is to run from dockerizing
 ```
 curl -sSL https://get.docker.com | sh # install docker if not installed
 cd data # go to dir where you want to place SQLite database
-docker run -v ${PWD}:/fabkey/data db.pl -a deploy_db -d data/skud.db 
+docker run -v ${PWD}:/fabkey/data db.pl -a deploy_db -d data/skud.db
 docker run -v ${PWD}:/fabkey/data db.pl -a demo_data -d data/skud.db
 docker run -d --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FABKEY_DBI=dbi:SQLite:dbname=data/skud.db" --privileged -v ${PWD}:/fabkey/data pavelsr/fabkey
 ```
@@ -54,32 +54,43 @@ docker run -d --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FA
 ```
 
 
+## Managing database
 
-## Database structure
+
+
+### WebUI and API
+
+Feature is in development :)
+
+Since web ui is not ready yet, now you can use following options to manage database content from browser or terminal (ncurses-based guis)
+
+### [sqlite-web](https://github.com/coleifer/sqlite-web)
+
+For now the best option
+
+
+### [sqlcrush](https://github.com/coffeeandscripts/sqlcrush)
+
+I have no succeed with this, but you can try
 
 ```
-CREATE TABLE users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    created DEFAULT CURRENT_TIMESTAMP,
-    card_id INTEGER,
-    pin INTEGER,
-    name VARCHAR(160),
-    surname VARCHAR(160),
-    email VARCHAR(160),
-    phone VARCHAR(12),
-    telegram_id INTEGER,
-    is_blocked INTEGER
-    )
-
-CREATE TABLE log (
-	id INTEGER PRIMARY KEY AUTOINCREMENT,
-	time DEFAULT CURRENT_TIMESTAMP,
-    reader_id INTEGER,
-    code INTEGER,
-    code_type VARCHAR(4),
-    user_id INTEGER
-    )
+sudo apt-get install postgresql libpq-dev
+sudo pip install sqlcrush
+sqlcrush -t sqlite -d skud.db
 ```
+
+when editing a database I have a `CRITICAL FAILURE...` [github issue](https://github.com/coffeeandscripts/sqlcrush/issues/7)
+
+### [sqlectron](https://sqlectron.github.io/) (for MySQL and PostgreSQL only now)
+
+```
+curl -sL https://deb.nodesource.com/setup_8.x | sudo -E bash -
+sudo apt install nodejs
+
+```
+
+
+
 
 ## Installation
 

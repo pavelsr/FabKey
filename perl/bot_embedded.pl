@@ -13,6 +13,7 @@ use JSON::MaybeXS;
 use Mojolicious::Lite;
 use lib '.';
 use DBUtil;
+use DBD::SQLite::Constants qw/:file_open/;
 use Data::Dumper;
 
 my $config;
@@ -26,7 +27,7 @@ my $telegram_token = $ENV{FABKEY_BOT_TOKEN} || $config->{FABKEY_BOT_TOKEN};
 my $bot_name = '';
 my $api;
 my $polling_timeout = 3; # default
-my $db = DBUtil->new(dbi => $config->{"DBI"});
+my $db = DBUtil->new(dbi => $config->{"DBI"}, flags => { sqlite_open_flags => SQLITE_OPEN_READONLY });
 app->log->debug("Using database: ".$config->{"DBI"}.", telegram_token");
 my $sessions = Telegram::BotKit::Sessions->new();
 

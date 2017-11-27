@@ -5,6 +5,7 @@ package DBUtil;
 use DBI;
 use strict;
 use DBD::SQLite;
+use DBD::SQLite::Constants qw/:file_open/;
 use Data::Dumper; # leave only for debug
 
 =head1 Usage
@@ -16,7 +17,7 @@ use Data::Dumper; # leave only for debug
 
 sub new {
     my ($class, %args) = @_;
-    $args{'dbh'} = DBI->connect($args{'dbi'},"","");
+    $args{'dbh'} = DBI->connect($args{'dbi'},"","", $args{'flags'});
     $args{'gpio_script'} = './open_gpio.sh';
     $args{'wireless_script'} = './open_wireless.sh';
     return bless \%args, $class;

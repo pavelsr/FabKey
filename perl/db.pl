@@ -134,7 +134,8 @@ if ($opts{action}[0] eq 'demo_data') {
       );
   my %user2 = (
       name=>'OnlyTelegramUser',
-      telegram_id=> 218718957
+      telegram_id=> 218718957,
+      pin => '1234'
   );
 
   $db->add_to_db( \%user1 ,'users');
