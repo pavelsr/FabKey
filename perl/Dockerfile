@@ -25,14 +25,24 @@ FROM armhf/alpine
 LABEL maintainer "Pavel Serikov <pavelsr@cpan.org>"
 
 COPY cpanfile ./
-COPY bot_embedded.pl /fabkey
 
 RUN apk update && \
-    apk add perl perl-dev g++ make wget curl wiringpi && \
+    apk add perl perl-dev g++ make wget curl wiringpi openssl openssl-dev && \
     curl -L https://cpanmin.us | perl - App::cpanminus && \
-    rm -rf /root/.cpanm/* /usr/local/share/man/*
+    rm -rf /root/.cpanm/* /usr/local/share/man/* && \
+    mkdir /fabkey
 
-RUN cpanm --installdeps . && rm cpanfile
+RUN cpanm Device::SerialPort
+RUN cpanm DBI
+RUN cpanm DBD::SQLite
+RUN cpanm Data::Dumper
+RUN cpanm JSON::MaybeXS
+RUN cpanm WWW::Telegram::BotAPI
+RUN cpanm Telegram::Bot::Message
+RUN cpanm Telegram::BotKit::Sessions
+RUN cpanm Telegram::BotKit::Keyboards
+
+COPY . /fabkey/
 
 CMD ["perl", "bot_embedded.pl", "daemon", "-l", "http://*:8080"]
 WORKDIR /fabkey
