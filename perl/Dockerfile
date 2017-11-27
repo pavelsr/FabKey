@@ -24,8 +24,6 @@ FROM armhf/alpine
 
 LABEL maintainer "Pavel Serikov <pavelsr@cpan.org>"
 
-COPY cpanfile ./
-
 RUN apk update && \
     apk add perl perl-dev g++ make wget curl wiringpi openssl openssl-dev && \
     curl -L https://cpanmin.us | perl - App::cpanminus && \
