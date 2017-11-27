@@ -18,12 +18,15 @@ use Data::Dumper;
 my $config;
 if (-e 'config.json') {
   $config = plugin JSONConfig => {file => 'config.json'};
+} else {
+  app->log->info("config.json file not found, using ENV variables")
+  $config->{"DBI"} = $ENV{FABKEY_DBI};
 }
 my $telegram_token = $ENV{FABKEY_BOT_TOKEN} || $config->{FABKEY_BOT_TOKEN};
 my $bot_name = '';
 my $api;
 my $polling_timeout = 3; # default
-my $db = DBUtil->new(dbi => $config->{"DBI"} || $ENV{FABKEY_DBI});
+my $db = DBUtil->new(dbi => $config->{"DBI"});
 app->log->debug("Using database: ".$config->{"DBI"});
 my $sessions = Telegram::BotKit::Sessions->new();
 
