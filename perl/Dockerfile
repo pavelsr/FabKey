@@ -48,10 +48,13 @@ RUN cpanm Telegram::Bot::Message
 RUN cpanm Telegram::BotKit::Sessions
 RUN cpanm Telegram::BotKit::Keyboards
 RUN cpanm Getopt::Long
+RUN cpanm Term::Choose
+RUN cpanm Term::Form
 
 COPY bot_embedded.pl /fabkey/
 COPY DBUtil.pm /fabkey/
 COPY db.pl /fabkey/
+COPY open_gpio.sh /fabkey/
 
 CMD ["perl", "bot_embedded.pl", "daemon", "-l", "http://*:8080"]
 WORKDIR /fabkey
