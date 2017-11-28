@@ -56,6 +56,7 @@ helper check_for_updates => sub {
 };
 
 my $door_info;
+my $fabkey_user_id; # for logs
 
 helper answer => sub {
 	my ($c, $update) = @_;
@@ -70,6 +71,7 @@ helper answer => sub {
   #$sessions->update($chat_id, $msg);
 
   my $fabkey_user = $db->search_user_in_db(telegram_id => $from_id, telegram_username => $update->{message}{from}{username});
+  $fabkey_user_id = $fabkey_user->{id};
 
   ## FSM
   # https://metacpan.org/pod/FSA::Rules
@@ -122,9 +124,10 @@ helper answer => sub {
     #if ($res eq 'Door with gpio_pin='.$door_info->{gpio_pin}.' is opened!') {  # msg from echo of open_gpio.sh
 
     if ($res eq '1') {  # msg from echo of open_gpio.sh
-      $api->sendMessage({ chat_id => $chat_id, text => 'Welcome to cmit!' });
+      $api->sendMessage({ chat_id => $chat_id, text => 'Welcome to cmit! If you just come please /checkin, if you leave please /checkout. If you just opened a door for someone do nothing' });
       $sessions->del($chat_id);
       my $door_info = {};
+      $fabkey_user_id = 0;
     } else {
       $api->sendMessage({
   				chat_id => $chat_id,
@@ -147,14 +150,24 @@ helper answer => sub {
           text => $update->{message}{from}{id}
     });
 
+  } elsif ( ($msg eq "/users_in") || ($msg eq '/users_in@'.$bot_name ) ) {
+    $api->sendMessage({
+          chat_id => $chat_id,
+          text => $db->users_in()
+    });
+
+  } elsif ( ($msg eq "/checkin") || ($msg eq '/checkin@'.$bot_name ) || ($msg eq '/checkout') || ($msg eq '/checkout@'.$bot_name ) ) {
+    $db->add_to_db({ door_id => $door_info->{id}, user_id => $fabkey_user_id }, 'entries'); # log entry
+    $api->sendMessage({
+        chat_id => $chat_id,
+        text => 'Stored. Good day!',
+    });
   } else {
     $api->sendMessage({
         chat_id => $chat_id,
         text => 'Command not recognized. Try to start a new session: /open',
       });
   }
-
-
 
 
   # $sessions->del($chat_id);

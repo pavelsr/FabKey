@@ -288,6 +288,44 @@ sub is_command_standart {
     if (grep { $commamnd eq $_ } qw/insert update delete/ ) { return 1; } else { return 0; }
 }
 
+
+# Algorithm is simpe. If number of entries of user is odd - user is in
+
+sub users_in {
+    my $self = shift;
+    # my $entries = $self->{dbh}->do('SELECT * FROM entries GROUP BY user_id');
+    my $entries = $self->{dbh}->selectall_hashref('SELECT * FROM entries', 'id');
+    my $clusterized_entries = {};
+    for (values %$entries) {
+      $clusterized_entries->{$_->{user_id}} ++;
+    }
+    warn Dumper $clusterized_entries;
+    # select idd user id
+    my @ids_in;
+    while (my ($key, $value) = each %$clusterized_entries) {
+      if ($value % 2 == 1) {
+        push @ids_in, $key;
+      }
+    }
+    # return \@ids_in;
+    my $msg_str;
+    for (@ids_in) {
+      if ($_) { # protection from non-empty id string
+        my $info = $self->search_in_table('users', id => $_);
+        # warn Dumper $info;
+        if ($info->{name} && $info->{surname}) {
+          $msg_str = $msg_str.'@'.$info->{telegram_username}." ".$info->{name}." ".$info->{surname}."\n";
+        } else {
+          $msg_str = $msg_str.'@'.$info->{telegram_username}."\n";
+        }
+      }
+    }
+    return $msg_str;
+}
+
+
+
+
 ### OLD CODE
 
 
