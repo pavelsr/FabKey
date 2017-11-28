@@ -8,6 +8,8 @@ use feature 'say';
 use Getopt::Long;
 use Data::Dumper;
 Getopt::Long::Configure("auto_version", "auto_help");
+use Term::Choose qw( choose );
+use Term::Form;
 
 my %opts;
 GetOptions (
@@ -185,6 +187,36 @@ if ($opts{action}[0] eq 'manage') {
 			$db->add_to_db({ $field => $value }, $table);
 			say "Table $table: item was added to database! ID:".$db->search_in_table($table, $field => $value)->{id};
 		}
+		if ($command eq 'delete') {
+			$db->dbh->do("DELETE FROM ".$table." WHERE ".$field." = ?", undef, $value) or die $db->dbh->errstr;
+			say "Item was deleted!";
+			#warn Dumper $db->dbh->do(q{DELETE FROM $table WHERE $field = ?}, undef, $value) or die $db->dbh->errstr;
+		}
+		if ($command eq 'update') {
+			my $item = $db->search_in_table($table, $field => $value);
+			if ($item) {
+				my @form;
+				while (my ($key, $value) = each %$item) {
+					push @form, [ $key, $value ];
+			  }
+				my $new = Term::Form->new('update_form');
+				my $modified_item = $new->fill_form( \@form, { confirm => '<< Save' } );
+				my $hash_for_insert;
+				for (@$modified_item) {
+					$hash_for_insert->{$_->[0]} = $_->[1];
+				}
+				warn Dumper $hash_for_insert if $opts{v};
+				## Need to substitute by $dbh->update_table_item
+				$db->dbh->do("DELETE FROM ".$table." WHERE ".$field." = ?", undef, $value) or die $db->dbh->errstr;
+				$db->add_to_db($hash_for_insert, $table);
+				say "Item was updated!";
+				# $db->update_table_item($table, %$hash_for_insert, id => $item->{id});
+			} else {
+				say "Item not found in database!";
+			}
+			#warn Dumper $db->dbh->do(q{DELETE FROM $table WHERE $field = ?}, undef, $value) or die $db->dbh->errstr;
+		}
+
 	} else { # for interactive mode
 		#$db->add_to_db($a_hash, $table);
 		# NEED TO CREATE GET ID BY PRIMARY KEY OR INDEX for universality

@@ -36,6 +36,28 @@ sub construct_or_statement {
 }
 
 
+sub construct_update_statement { # just comma-separated values
+  my ($self, %kv) = @_; # %kv - key-value hash
+  my $str = (keys %kv)[0].'=\''.(values %kv)[0].'\'';
+  delete $kv{(keys %kv)[0]};
+  while (my ($key, $value) = each %kv) {
+    $str = join(',', $str, ' '.$key.'=\''.$value.'\'');
+  }
+  return $str;
+}
+
+
+sub update_table_item {
+  my ($self, $table, %updated_fields, %where_kv) = @_;
+  # warn "Where key val ".Dumper \%where_key_val;
+  my $set = $self->construct_update_statement(%updated_fields);
+  my $where = (keys %where_kv)[0]."=\'".(values %where_kv)[0]."\'";
+  # warn "Where str ".Dumper $where;
+  my $sql_cmd = "UPDATE ".$table." SET ".$set." WHERE ".$where;
+  warn Dumper $sql_cmd;
+  warn Dumper $self->dbh->do($sql_cmd) or die $self->{dbh}->errstr;
+}
+
 
 =head1 search_user_in_db
 
@@ -104,13 +126,22 @@ Check is user allowed to use particular door
 sub open_door {
 	my ($self, $door_id) = @_;  # $kv - key & value
   my $res = $self->{dbh}->selectrow_hashref('SELECT * FROM doors WHERE id='.$door_id);
+  warn "Door info".Dumper $res;
   if (defined $res) {
     if ($res->{opening_script}) {
-      return `$res->{opening_script}`;
+      if (-e $res->{opening_script}) {
+        return `$res->{opening_script}`;
+      } else {
+        return "No such opening_script: ".$res->{opening_script};
+      }
     } elsif ($res->{gpio_pin}){
       return `$self->{gpio_script} $res->{gpio_pin}`;  # use default script for gpio
     } elsif ($res->{mac_addr}) {
-      return `$self->{wireless_script} $res->{mac_addr}`;
+      if (-e $res->{opening_script}) {
+        return `$self->{wireless_script} $res->{mac_addr}`;
+      } else {
+        return "No such wireless_script: ".$res->{opening_script};
+      }
     } else {
       return "No door opening definition";
     }
@@ -181,12 +212,14 @@ sub authorize_user {
   if (@absent_params) {
     return 'Not enough parameters provided: '.join(', ',@absent_params);
   }
-  my %filtered_params = map { $_ => $params->{$_} } grep { exists $params->{$_} } qw/telegram_id card_id telegram_username/;
-  my $user = $self->search_user_in_db(%filtered_params);
-  warn Dumper $user;
-  if (%$user)  {
 
-    if ($self->is_door_restricted($params->{door_id})) {  # not implemented yet
+  my %filtered_params = map { $_ => $params->{$_} } grep { exists $params->{$_} } qw/telegram_id card_id telegram_username/; # all unique indexes
+  warn "User search criterias: ".Dumper \%filtered_params;
+  my $user = $self->search_user_in_db(%filtered_params);
+  warn "User found: ". Dumper $user;
+
+  if (%$user)  {
+    if ($self->is_door_restricted($params->{door_id})) {  # not implemented yet. or substitute it with table_info
       my $perm = $self->door_permissions_all($params->{door_id});
       warn "All door permissions: ".Dumper $perm;
       return "Door is restricted for particular users. But check code is not implemented yet :)"
@@ -235,6 +268,9 @@ sub column_names {
   my ($self, $table_name) = @_;
   return $self->{dbh}->prepare('SELECT * FROM '.$table_name)->{NAME};
 }
+
+
+# like a https://metacpan.org/pod/Term::Form
 
 sub ask_for_values {
     my ($self, $fields_array) = @_;

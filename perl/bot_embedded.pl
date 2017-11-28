@@ -106,6 +106,7 @@ helper answer => sub {
   } elsif ($sessions->last($chat_id) eq 2) { # password handler
 
     my $rp = {
+      telegram_username => $update->{message}{from}{username},
       telegram_id => $from_id,
       door_id => $door_info->{id},
       pin => $msg
@@ -114,9 +115,9 @@ helper answer => sub {
 
     # my $res = $c->ua->get( $config->{"MAIN_SRV_URL"} => form => $rp )->res->json;
 
-    my $res = $db->authorize_user($rp);
+    my $res = $db->authorize_user($rp); # result of ->open_door method
 
-    app->log->info("Result of server API call: ".Dumper $res);
+    app->log->info("Result of authorize_user() call - same as server API return: ".Dumper $res);
 
     #if ($res eq 'Door with gpio_pin='.$door_info->{gpio_pin}.' is opened!') {  # msg from echo of open_gpio.sh
 
@@ -127,7 +128,7 @@ helper answer => sub {
     } else {
       $api->sendMessage({
   				chat_id => $chat_id,
-  				text => 'Some problems occured. Try to start a new session: /open',
+  				text => 'Some problems occured. Try to start a new session with /open or reach @serikoff for support',
   			});
     }
     # $sessions->del($chat_id);
