@@ -34,12 +34,12 @@ The simplest way is to run from dockerizing
 ```
 curl -sSL https://get.docker.com | sh - # install docker if not installed
 cd data # go to dir where you want to place SQLite database
-docker run -v ${PWD}:/fabkey/data perl db.pl -a deploy_db -d data/skud.db
+docker run -v ${PWD}:/fabkey/data pavelsr/fabkey:armhf perl db.pl -a deploy_db -d data/skud.db
 docker run -v ${PWD}:/fabkey/data perl db.pl -a manage users insert telegram_username serikoff -d data/skud.db
 docker run -v ${PWD}:/fabkey/data perl db.pl -a manage users update telegram_username serikoff  # add pin
 docker run -v ${PWD}:/fabkey/data perl db.pl -a manage doors insert name Main_door -d data/skud.db
 docker run -v ${PWD}:/fabkey/data perl db.pl -a manage doors update name Main_door # add gpio_pin or opening_script
-# docker run -v ${PWD}:/fabkey/data db.pl -a demo_data -d data/skud.db # or simply execute instead last 4 strings for inserting demo data
+# docker run -v ${PWD}:/fabkey/data pavelsr/fabkey:armhf perl db.pl -a demo_data -d data/skud.db # or simply execute instead last 4 strings for inserting demo data
 docker run -d --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FABKEY_DBI=dbi:SQLite:dbname=data/skud.db" --privileged -v ${PWD}:/fabkey/data pavelsr/fabkey
 ```
 

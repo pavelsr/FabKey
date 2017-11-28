@@ -142,12 +142,12 @@ if ($opts{action}[0] eq 'demo_data') {
   my %user1 = (
          card_id=> 7357893,
          pin=> 1234,
-         name=>'OnlyCardUser',
+         first_name=>'OnlyCardUser',
          email=>'pavelsr@cpan.org',
          phone=>'+78633090549'
       );
   my %user2 = (
-      name=>'OnlyTelegramUser',
+      first_name=>'OnlyTelegramUser',
       telegram_id=> 218718957,
       pin => '1234',
 			is_admin => 1
