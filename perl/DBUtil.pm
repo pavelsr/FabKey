@@ -85,7 +85,10 @@ sub search_in_table {
   $self->{dbh}->selectrow_hashref('SELECT * FROM '.$table_name.' WHERE '.$self->construct_or_statement(%kv));   # need to call from DBI::st instead of DBI::db
 }
 
-
+sub select_all_in_table {
+  my ($self, $table_name) = @_;
+  $self->{dbh}->selectall_hashref('SELECT * FROM '.$table_name, 'id');
+}
 
 
 =head1 door_permissions_all
@@ -257,7 +260,9 @@ sub prepare_sql {
 sub add_to_db {
     my ($self, $hash, $table_name) = @_;
     my $h = $self->prepare_sql($hash);
-    $self->{dbh}->do("INSERT INTO ".$table_name." (".$h->{'fields'}.") VALUES (".$h->{'values'}.")") or die $self->{dbh}->errstr;
+    my $sql = "INSERT INTO ".$table_name." (".$h->{'fields'}.") VALUES (".$h->{'values'}.")";
+    warn Dumper $sql;
+    $self->{dbh}->do($sql) or die $self->{dbh}->errstr;
     return 0;
 }
 

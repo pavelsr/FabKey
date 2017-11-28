@@ -29,7 +29,7 @@ my $api;
 my $polling_timeout = 3; # default
 my $db = DBUtil->new(dbi => $config->{"DBI"});
 # my $db = DBUtil->new(dbi => $config->{"DBI"}, flags => { sqlite_open_flags => SQLITE_OPEN_READONLY });
-app->log->debug("Using database: ".$config->{"DBI"}.", telegram_token");
+app->log->debug("Using database: ".$config->{"DBI"}.", telegram_token: ".$telegram_token);
 my $sessions = Telegram::BotKit::Sessions->new();
 
 helper check_for_updates => sub {
@@ -162,6 +162,31 @@ helper answer => sub {
         chat_id => $chat_id,
         text => 'Stored. Good day!',
     });
+  } elsif ( (($msg eq "/admin") || ($msg eq '/admin@'.$bot_name )) && ($fabkey_user->{is_admin} == 1) ) {
+      my $requests = $db->select_all_in_table('telegram_admission_requests');
+      while (my ($key, $value) = each %$requests) {
+        $api->sendMessage({
+            chat_id => $chat_id,
+            text => '/approve '.$key.' @'.$value->{username}.' '.$value->{first_name}.' '.$value->{last_name}
+          });
+      }
+  } elsif ( $msg =~ m/\/approve/ ) {
+    # msg like '/approve 218718957 @serikoff Pavel Serikov'
+    warn Dumper $msg;
+    my @cmd = split(' ', $msg);
+    $cmd[2] =~ s/\@//g; # remove '@' from username tto prevent sql error
+    my $hash = {
+      telegram_id => $cmd[1],
+      telegram_username => $cmd[2],
+      first_name => $cmd[3],
+      last_name => $cmd[4]
+    };
+    warn Dumper $hash;
+    $db->add_to_db($hash, 'users');
+    $api->sendMessage({
+        chat_id => $chat_id,
+        text => 'User '.$hash->{telegram_username}.' approved'
+      });
   } else {
     $api->sendMessage({
         chat_id => $chat_id,

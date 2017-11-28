@@ -102,8 +102,8 @@ CREATE TABLE users (
 		telegram_id INTEGER,
 		telegram_username VARCHAR(160),
     pin INTEGER(4),
-    name VARCHAR(160),
-    surname VARCHAR(160),
+    first_name VARCHAR(160),
+   	last_name VARCHAR(160),
 		phone VARCHAR(12),
     email VARCHAR(160),
 		is_blocked INTEGER,
@@ -149,7 +149,8 @@ if ($opts{action}[0] eq 'demo_data') {
   my %user2 = (
       name=>'OnlyTelegramUser',
       telegram_id=> 218718957,
-      pin => '1234'
+      pin => '1234',
+			is_admin => 1
   );
 
   $db->add_to_db( \%user1 ,'users');

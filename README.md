@@ -1,10 +1,10 @@
 # FabKey
 
-Completely opensource Arduino-based access control system for FabLabs/Hackerspaces/any public space wants
-cheap access control
+Completely opensource Arduino-based access control system for FabLabs/Hackerspaces/any collaborative space which needs cheap access control
 Support Wiegand readers with keypad too (like Smartec ST-PR160EK)
 Based on software Ardiuno interrupts and timers.
-Easy control it via web browser or Telegram bot
+Easy control it via web browser or Telegram bot.
+Is possible to add customs scripts for opening doors (e.g. if you have two doors and you need to open it one by one for current balancing)
 Backend is based on Perl.
 
 ## Features
@@ -34,12 +34,35 @@ The simplest way is to run from dockerizing
 ```
 curl -sSL https://get.docker.com | sh - # install docker if not installed
 cd data # go to dir where you want to place SQLite database
-docker run -v ${PWD}:/fabkey/data db.pl -a deploy_db -d data/skud.db
-docker run -v ${PWD}:/fabkey/data db.pl -a demo_data -d data/skud.db
+docker run -v ${PWD}:/fabkey/data perl db.pl -a deploy_db -d data/skud.db
+docker run -v ${PWD}:/fabkey/data perl db.pl -a manage users insert telegram_username serikoff -d data/skud.db
+docker run -v ${PWD}:/fabkey/data perl db.pl -a manage users update telegram_username serikoff  # add pin
+docker run -v ${PWD}:/fabkey/data perl db.pl -a manage doors insert name Main_door -d data/skud.db
+docker run -v ${PWD}:/fabkey/data perl db.pl -a manage doors update name Main_door # add gpio_pin or opening_script
+# docker run -v ${PWD}:/fabkey/data db.pl -a demo_data -d data/skud.db # or simply execute instead last 4 strings for inserting demo data
 docker run -d --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FABKEY_DBI=dbi:SQLite:dbname=data/skud.db" --privileged -v ${PWD}:/fabkey/data pavelsr/fabkey
 ```
 
-## Built-in database scripts
+You can add docker to upstart:
+
+```
+sudo systemctl enable docker
+```
+
+
+## Managing users
+
+Currently there is two possible options - bot commands or console. UI is in development
+
+### Bot commands
+
+If is_admin = 1 user can add other users via /admin and /approve commands
+
+To request an access each user can send /addme command
+
+Also fabKey comes with db.pl script for managing database via console
+
+### Console
 
 Managing users:
 
@@ -53,15 +76,14 @@ Quick add/remove/update:
 docker exec -it db.pl -a manage users delete telegram_username serikoff
 ```
 
-
-### Console
+Interactive mode:
 
 ```
-docker exec -t -i fabkey db.pl -a manage add -t users
+docker exec -t -i fabkey db.pl -a manage add users
 ```
 
 
-## config.json Example
+## config.json (using in dev machine) example
 
 ```
 {
@@ -76,7 +98,7 @@ docker exec -t -i fabkey db.pl -a manage add -t users
 ```
 
 
-## Managing database
+## Managing database via third-party tools
 
 ### WebUI and API
 
@@ -128,8 +150,3 @@ Also just view database content
 sudo cpanm App::DBBrowser
 
 ```
-
-
-## Installation
-
-Check the [wiki](https://github.com/FabLab61/FabKey/wiki)
