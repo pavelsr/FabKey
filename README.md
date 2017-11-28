@@ -40,7 +40,7 @@ docker run -v ${PWD}:/fabkey/data perl db.pl -a manage users update telegram_use
 docker run -v ${PWD}:/fabkey/data perl db.pl -a manage doors insert name Main_door -d data/skud.db
 docker run -v ${PWD}:/fabkey/data perl db.pl -a manage doors update name Main_door # add gpio_pin or opening_script
 # docker run -v ${PWD}:/fabkey/data pavelsr/fabkey:armhf perl db.pl -a demo_data -d data/skud.db # or simply execute instead last 4 strings for inserting demo data
-docker run -d --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FABKEY_DBI=dbi:SQLite:dbname=data/skud.db" --privileged -v ${PWD}:/fabkey/data pavelsr/fabkey
+docker run -d --restart=always --name fabkey -e "FABKEY_BOT_TOKEN=<paste_your_token_here>" -e "FABKEY_DBI=dbi:SQLite:dbname=data/skud.db" --privileged -v ${PWD}:/fabkey/data pavelsr/fabkey
 ```
 
 You can add docker to upstart:
@@ -119,7 +119,7 @@ sqlite_web skud.db -x -d -H 0.0.0.0
 For constant monitoring of your DB via web interface you can run [docker container](https://hub.docker.com/r/pavelsr/sqlite_web/) (run command below from folder where your database is stored)
 
 ```
-sudo docker run -d -v ${PWD}:/root -p 80:8080 pavelsr/sqlite_web:armhf skud.db
+sudo docker run -d --restart=always -v ${PWD}:/root -p 80:8080 pavelsr/sqlite_web:armhf skud.db
 ```
 
 ### [sqlcrush](https://github.com/coffeeandscripts/sqlcrush)

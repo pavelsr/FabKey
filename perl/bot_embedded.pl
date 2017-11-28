@@ -117,23 +117,26 @@ helper answer => sub {
 
     # my $res = $c->ua->get( $config->{"MAIN_SRV_URL"} => form => $rp )->res->json;
 
-    my $res = $db->authorize_user($rp); # result of ->open_door method
+    my $door_opening_cmd_or_error = $db->authorize_user($rp); # script + cmd hash
+    app->log->info("authorize_user() result: ".Dumper $door_opening_cmd_or_error);
 
-    app->log->info("Result of authorize_user() call - same as server API return: ".Dumper $res);
-
-    #if ($res eq 'Door with gpio_pin='.$door_info->{gpio_pin}.' is opened!') {  # msg from echo of open_gpio.sh
-
-    if ($res eq '1') {  # msg from echo of open_gpio.sh
-      $api->sendMessage({ chat_id => $chat_id, text => 'Welcome to cmit! If you just come please /checkin, if you leave please /checkout. If you just opened a door for someone do nothing' });
-      $sessions->del($chat_id);
-      my $door_info = {};
-      $fabkey_user_id = 0;
+    if (-e $door_opening_cmd_or_error->{script}) { # file exists
+        app->log->info("Script exists and we will try to execute it");
+        my $cmd = $door_opening_cmd_or_error->{cmd};
+        my $res = `$cmd`;
+        if ($res eq '1') {  # msg from echo of open_gpio.sh. 1 - standart success message
+          $api->sendMessage({ chat_id => $chat_id, text => 'Welcome to cmit! If you just come please /checkin, if you leave please /checkout. If you just opened a door for someone do nothing' });
+          app->log->info("Door is opened!");
+          $sessions->del($chat_id);
+          my $door_info = {};
+          $fabkey_user_id = 0;
+        } else {
+            $api->sendMessage({ chat_id => $chat_id, text => 'Some problems occured: door script returned an error. Try to start a new session with /open or reach @serikoff for support' });
+        }
     } else {
-      $api->sendMessage({
-  				chat_id => $chat_id,
-  				text => 'Some problems occured. Try to start a new session with /open or reach @serikoff for support',
-  			});
+        $api->sendMessage({ chat_id => $chat_id, text => 'Problems with user authoriztion: '.$door_opening_cmd_or_error });
     }
+
     # $sessions->del($chat_id);
   } elsif ( ($msg eq "/addme") || ($msg eq '/addme@'.$bot_name ) ) {
     app->log->info("Some user requested access: ".Dumper $update->{message}{from});

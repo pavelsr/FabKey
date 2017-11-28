@@ -164,7 +164,7 @@ if ($opts{action}[0] eq 'demo_data') {
       );
 
   my %door2 = (
-        name=> "Door 2",
+        name=> "Door 2 (script)",
         opening_script=> 'data/main_door_with_delay.sh'  # in data location
     );
 

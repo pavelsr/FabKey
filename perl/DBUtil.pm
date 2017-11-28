@@ -118,10 +118,32 @@ sub is_user_allowed_door {
   if (%$res) { return 1 } else { return 0 };
 }
 
+## Return hash like
+# {
+#   script => 'gpio.sh',
+#   cmd => 'sh gpio.sh 20'
+# }
 
-=head1 is_user_allowed_door
 
-Check is user allowed to use particular door
+sub get_door_opening_script_and_cmd {
+  my ($self, $door_id) = @_;  # $kv - key & value
+  my $res = $self->{dbh}->selectrow_hashref('SELECT * FROM doors WHERE id='.$door_id);
+  warn "Door info".Dumper $res;
+  if ($res->{opening_script}) {
+    return { cmd => 'sh '.$res->{opening_script}, script => $res->{opening_script} };
+  } elsif ($res->{gpio_pin}){
+    return { cmd => 'sh open_gpio.sh '.$res->{gpio_pin}, script => 'open_gpio.sh' };
+  } elsif ($res->{mac_addr}) {
+    return { cmd => 'sh open_by_mac.sh'.$res->{mac_addr}, script => 'open_by_mac.sh' };
+  } else {
+    return undef;
+  }
+}
+
+
+=head1 open_door
+
+DEPRECIATED
 
 =cut
 
@@ -197,6 +219,8 @@ sub get_door_info_by_name {
 
 Perhaps the main function of business logic
 
+Return door opening script if user is authorized
+
 =cut
 
 
@@ -228,7 +252,8 @@ sub authorize_user {
       return "Door is restricted for particular users. But check code is not implemented yet :)"
     } else { # door is common
       if ($user->{pin} eq $params->{pin}) {
-        return $self->open_door($params->{door_id});
+        #return $self->open_door($params->{door_id});\
+        return $self->get_door_opening_script_and_cmd($params->{door_id});
       } else {
         return 'Wrong password!';
       }
