@@ -119,20 +119,22 @@ helper answer => sub {
 
     my $door_opening_cmd_or_error = $db->authorize_user($rp); # script + cmd hash
     app->log->info("authorize_user() result: ".Dumper $door_opening_cmd_or_error);
-
-    if (-e $door_opening_cmd_or_error->{script}) { # file exists
-        app->log->info("Script exists and we will try to execute it");
-        my $cmd = $door_opening_cmd_or_error->{cmd};
-        my $res = `$cmd`;
-        if ($res eq '1') {  # msg from echo of open_gpio.sh. 1 - standart success message
-          $api->sendMessage({ chat_id => $chat_id, text => 'Welcome to cmit! If you just come please /checkin, if you leave please /checkout. If you just opened a door for someone do nothing' });
-          app->log->info("Door is opened!");
-          $sessions->del($chat_id);
-          my $door_info = {};
-          $fabkey_user_id = 0;
-        } else {
-            $api->sendMessage({ chat_id => $chat_id, text => 'Some problems occured: door script returned an error. Try to start a new session with /open or reach @serikoff for support' });
-        }
+    if (ref($door_opening_cmd_or_errorf) eq 'HASH') {  # authorize_user returned a script so user is authorized
+    # $door_opening_cmd_or_error can be hash or string
+      if (-e $door_opening_cmd_or_error->{script}) { # problem is that here can without ->{script} in case of error
+          app->log->info("Script exists and we will try to execute it");
+          my $cmd = $door_opening_cmd_or_error->{cmd};
+          my $res = `$cmd`;
+          if ($res eq '1') {  # msg from echo of open_gpio.sh. 1 - standart success message
+            $api->sendMessage({ chat_id => $chat_id, text => 'Welcome to cmit! If you just come please /checkin, if you leave please /checkout. If you just opened a door for someone do nothing' });
+            app->log->info("Door is opened!");
+            $sessions->del($chat_id);
+            my $door_info = {};
+            $fabkey_user_id = 0;
+          } else {
+              $api->sendMessage({ chat_id => $chat_id, text => 'Some problems occured: door script returned an error. Try to start a new session with /open or reach @serikoff for support' });
+          }
+      }
     } else {
         $api->sendMessage({ chat_id => $chat_id, text => 'Problems with user authoriztion: '.$door_opening_cmd_or_error });
     }
