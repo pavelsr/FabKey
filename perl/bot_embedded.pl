@@ -184,7 +184,8 @@ helper answer => sub {
       telegram_id => $cmd[1],
       telegram_username => $cmd[2],
       first_name => $cmd[3],
-      last_name => $cmd[4]
+      last_name => $cmd[4],
+      pin => 1234
     };
     warn Dumper $hash;
     $db->add_to_db($hash, 'users');
