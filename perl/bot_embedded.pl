@@ -119,7 +119,7 @@ helper answer => sub {
 
     my $door_opening_cmd_or_error = $db->authorize_user($rp); # script + cmd hash
     app->log->info("authorize_user() result: ".Dumper $door_opening_cmd_or_error);
-    if (ref($door_opening_cmd_or_errorf) eq 'HASH') {  # authorize_user returned a script so user is authorized
+    if (ref($door_opening_cmd_or_error) eq 'HASH') {  # authorize_user returned a script so user is authorized
     # $door_opening_cmd_or_error can be hash or string
       if (-e $door_opening_cmd_or_error->{script}) { # problem is that here can without ->{script} in case of error
           app->log->info("Script exists and we will try to execute it");
