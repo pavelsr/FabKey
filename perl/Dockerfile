@@ -28,12 +28,12 @@
 # https://hub.docker.com/r/armhf/perl/
 # https://hub.docker.com/r/armhf/alpine/
 
-FROM armhf/alpine
+FROM resin/rpi-raspbian
 
 LABEL maintainer "Pavel Serikov <pavelsr@cpan.org>"
 
-RUN apk update && \
-    apk add perl perl-dev g++ make wget curl wiringpi openssl openssl-dev && \
+RUN apt-get update && \
+    apt-get install perl libperl-dev g++ make wget curl wiringpi openssl libssl-dev && \
     curl -L https://cpanmin.us | perl - App::cpanminus && \
     rm -rf /root/.cpanm/* /usr/local/share/man/* && \
     mkdir /fabkey
@@ -57,6 +57,7 @@ COPY db.pl /fabkey/
 COPY open_gpio.sh /fabkey/
 
 CMD ["perl", "bot_embedded.pl", "daemon", "-l", "http://*:8080"]
+
 WORKDIR /fabkey
 
 EXPOSE 8080
