@@ -62,6 +62,19 @@ To request an access each user can send /addme command
 
 Also fabKey comes with db.pl script for managing database via console
 
+List of all commands (for /setcommands of @BotFather):
+
+```
+open - Open selected door
+users_in - Show who inside CMIT
+checkin - Send this command when you just come to CMIT
+checkout - Send this command when you are leaving CMIT
+admin - Show all approval requests
+approve - Approve particular user (forward admin message back to bot)
+
+```
+
+
 ### Console
 
 Managing users:
