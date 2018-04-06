@@ -57,6 +57,6 @@ plugin Yancy => {
     }
 };
 
-print "Running Yancy on $ARGV[0] database"
+print "Running Yancy on $ARGV[0] database";
 
 app->start;
