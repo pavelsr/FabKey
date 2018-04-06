@@ -3,7 +3,7 @@ use Mojo::SQLite;
 use Yancy;
 
 plugin Yancy => {
-    backend => $ARGV[0] || 'sqlite:skud.db',
+    backend => 'sqlite:skud.db',
     read_schema => 1,
     collections => {
         doors => {
@@ -57,6 +57,6 @@ plugin Yancy => {
     }
 };
 
-print "Running Yancy on $ARGV[0] database";
+# print "Running Yancy on $ARGV[0] database";
 
 app->start;
