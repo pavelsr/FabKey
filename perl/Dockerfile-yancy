@@ -16,8 +16,9 @@ RUN apt-get update && \
     mkdir /fabkey
 
 RUN cpanm Yancy
+COPY yancy.pl /root/yancy.pl
 
-CMD ["morbo", "skud.db"]
+CMD ["morbo", "yancy.pl"]
 
 WORKDIR /root
 
