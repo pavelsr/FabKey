@@ -1,6 +1,10 @@
 # Build
 # docker build -t pavelsr/yancy-fabkey-alpine --file Dockerfile-min-yancy .
 
+# True running:
+# in directory with skud.db
+# docker run -p 3000:80 -v ${PWD}:/root pavelsr/yancy-fabkey-alpine
+
 FROM arm32v6/alpine
 
 LABEL maintainer "Pavel Serikov <pavelsr@cpan.org>"
@@ -11,6 +15,7 @@ RUN apk update && \
     rm -rf /root/.cpanm/* /usr/local/share/man/* && \
     cpanm Mojolicious Yancy
 
+RUN cpanm Mojo::SQLite
 
 COPY yancy.pl /root/yancy.pl
 
