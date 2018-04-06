@@ -1,0 +1,21 @@
+# Build
+# docker build -t pavelsr/yancy-fabkey-alpine --file Dockerfile-min-yancy .
+
+FROM arm32v6/alpine
+
+LABEL maintainer "Pavel Serikov <pavelsr@cpan.org>"
+
+RUN apk update && \
+    apk add perl perl-dev g++ make wget curl && \
+    curl -L https://cpanmin.us | perl - App::cpanminus && \
+    rm -rf /root/.cpanm/* /usr/local/share/man/* && \
+    cpanm Mojolicious Yancy
+
+
+COPY yancy.pl /root/yancy.pl
+
+CMD ["morbo", "yancy.pl"]
+
+WORKDIR /root
+
+EXPOSE 3000

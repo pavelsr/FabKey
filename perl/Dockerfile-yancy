@@ -1,5 +1,5 @@
 # Build
-# docker build -t pavelsr/yancy-fabkey Dockerfile-yancy
+# docker build -t pavelsr/yancy-fabkey --file Dockerfile-yancy .
 
 # True running:
 # docker run -p 3000:80 -v ${PWD}:/root pavelsr/yancy-fabkey
