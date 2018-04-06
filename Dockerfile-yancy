@@ -1,0 +1,24 @@
+# Build
+# docker build -t pavelsr/yancy-fabkey Dockerfile-yancy
+
+# True running:
+# docker run -p 3000:80 -v ${PWD}:/root pavelsr/yancy-fabkey
+
+
+FROM resin/rpi-raspbian
+
+LABEL maintainer "Pavel Serikov <pavelsr@cpan.org>"
+
+RUN apt-get update && \
+    apt-get install perl libperl-dev g++ make wget curl wiringpi openssl libssl-dev && \
+    curl -L https://cpanmin.us | perl - App::cpanminus && \
+    rm -rf /root/.cpanm/* /usr/local/share/man/* && \
+    mkdir /fabkey
+
+RUN cpanm Yancy
+
+CMD ["morbo", "skud.db"]
+
+WORKDIR /root
+
+EXPOSE 3000
