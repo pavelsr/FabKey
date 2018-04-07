@@ -3,7 +3,7 @@
 
 # True running:
 # in directory with skud.db
-# docker run -p 3000:80 -v ${PWD}:/root pavelsr/yancy-fabkey-alpine
+# docker run -d -p 80:3000 -v ${PWD}/skud.db:/root/skud.db pavelsr/yancy-fabkey-alpine
 
 FROM arm32v6/alpine
 
@@ -17,10 +17,10 @@ RUN apk update && \
 
 RUN cpanm Mojo::SQLite
 
-COPY yancy.pl /root/yancy.pl
+COPY yancy.pl /yancy/yancy.pl
 
 CMD ["morbo", "yancy.pl"]
 
-WORKDIR /root
+WORKDIR /yancy
 
 EXPOSE 3000
